@@ -1,4 +1,4 @@
-import { LogoutButton } from "@/components/logout-button";
+import { AppNav } from "@/components/app-nav";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -18,23 +18,21 @@ async function DashboardContent() {
         <p className="text-sm text-muted-foreground">Signed in as:</p>
         <p className="mt-1 break-words text-base font-medium">{email}</p>
       </div>
-      <div className="mt-8">
-        <LogoutButton />
-      </div>
     </>
   );
 }
 
 export default function DashboardPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <section className="w-full max-w-md">
+    <div className="min-h-screen">
+      <AppNav />
+      <main className="mx-auto w-full max-w-xl px-6 py-14">
         <p className="text-sm font-medium">SIDE</p>
-        <h1 className="mt-8 text-3xl font-semibold">Welcome to SIDE</h1>
+        <h1 className="mt-3 text-3xl font-semibold">Welcome to SIDE</h1>
         <Suspense fallback={null}>
           <DashboardContent />
         </Suspense>
-      </section>
-    </main>
+      </main>
+    </div>
   );
 }
