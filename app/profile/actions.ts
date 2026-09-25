@@ -90,9 +90,24 @@ export async function createProfileDraft(
     return { error: "Please sign in again before continuing." };
   }
 
-  const { error: contextError } = await currentUser.supabase
+  const { data: existingContext, error: contextLookupError } = await currentUser.supabase
     .from("private_profile_context")
-    .upsert({ id: currentUser.id, ...normalizedContext }, { onConflict: "id" });
+    .select("id")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  if (contextLookupError) {
+    return { error: "We could not save what you shared. Please try again." };
+  }
+
+  const { error: contextError } = existingContext
+    ? await currentUser.supabase
+        .from("private_profile_context")
+        .update(normalizedContext)
+        .eq("id", currentUser.id)
+    : await currentUser.supabase
+        .from("private_profile_context")
+        .insert({ id: currentUser.id, ...normalizedContext });
 
   if (contextError) {
     return { error: "We could not save what you shared. Please try again." };

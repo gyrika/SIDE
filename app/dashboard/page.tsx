@@ -7,9 +7,28 @@ async function DashboardContent() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   const email = data?.claims?.email;
+  const userId = data?.claims?.sub;
 
-  if (error || typeof email !== "string") {
+  if (error || typeof email !== "string" || typeof userId !== "string") {
     redirect("/auth/login");
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (profileError) {
+    return (
+      <p className="mt-8 text-sm text-muted-foreground">
+        SIDE could not check your profile right now. Please try again.
+      </p>
+    );
+  }
+
+  if (!profile) {
+    redirect("/profile");
   }
 
   return (
